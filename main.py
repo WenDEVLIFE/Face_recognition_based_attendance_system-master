@@ -224,6 +224,7 @@ def TakeImages():
             writer.writerow(row)
         csvFile.close()
         message1.configure(text=res)
+        message.configure(text='Total Registrations till now  : ' + str(serial))
         mess._show(title='Registration Successful', message='Images taken successfully for ID: ' + Id + '. Please click "Save Profile" to complete registration.')
     else:
         if (name.isalpha() == False):
@@ -247,7 +248,7 @@ def TrainImages():
     recognizer.save("TrainingImageLabel/Trainner.yml")
     res = "Profile Saved Successfully"
     message1.configure(text=res)
-    message.configure(text='Total Registrations till now  : ' + str(ID[0]))
+    message.configure(text='Total Registrations till now  : ' + str(len(set(ID))))
     mess._show(title='Profile Saved', message='Profile trained and saved successfully!')
 
 ############################################################################################3
