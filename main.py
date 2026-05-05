@@ -11,6 +11,9 @@ import pandas as pd
 import datetime
 import time
 
+# Ensure working directory is the script's directory
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 ############################################# FUNCTIONS ################################################
 
 def assure_path_exists(path):
@@ -519,6 +522,59 @@ quitWindow = tk.Button(frame1, text="Quit", command=window.destroy  ,fg=TEXT_COL
 quitWindow.place(x=30, y=450)
 
 ##################### END ######################################
+
+def show_login_window():
+    window.withdraw() # hide main window
+    
+    login_win = tk.Toplevel(window)
+    login_win.geometry("400x260")
+    login_win.resizable(False, False)
+    login_win.title("Admin Login")
+    login_win.configure(background=BG_COLOR)
+    
+    def on_closing():
+        window.destroy()
+        
+    login_win.protocol("WM_DELETE_WINDOW", on_closing)
+    
+    lbl_title = tk.Label(login_win, text="System Login", bg=BG_COLOR, fg=TEXT_COLOR, font=('times', 18, 'bold'))
+    lbl_title.pack(pady=15)
+    
+    frame_inputs = tk.Frame(login_win, bg=BG_COLOR)
+    frame_inputs.pack(pady=5)
+    
+    lbl_user = tk.Label(frame_inputs, text="Username:", bg=BG_COLOR, fg=TEXT_COLOR, font=('times', 12, 'bold'))
+    lbl_user.grid(row=0, column=0, padx=10, pady=5, sticky='e')
+    
+    ent_user = tk.Entry(frame_inputs, width=20, bg=INPUT_BG, fg=TEXT_COLOR, font=('times', 12, 'bold'), insertbackground=TEXT_COLOR)
+    ent_user.insert(0, "admin")
+    ent_user.grid(row=0, column=1, padx=10, pady=5)
+    
+    lbl_pass = tk.Label(frame_inputs, text="Password:", bg=BG_COLOR, fg=TEXT_COLOR, font=('times', 12, 'bold'))
+    lbl_pass.grid(row=1, column=0, padx=10, pady=5, sticky='e')
+    
+    ent_pass = tk.Entry(frame_inputs, width=20, bg=INPUT_BG, fg=TEXT_COLOR, font=('times', 12, 'bold'), show='*', insertbackground=TEXT_COLOR)
+    ent_pass.grid(row=1, column=1, padx=10, pady=5)
+    
+    def validate_login():
+        user = ent_user.get()
+        pwd = ent_pass.get()
+        
+        saved_pwd = "admin"
+        if os.path.isfile("TrainingImageLabel/psd.txt"):
+            with open("TrainingImageLabel/psd.txt", "r") as tf:
+                saved_pwd = tf.read().strip()
+                
+        if user == "admin" and pwd == saved_pwd:
+            login_win.destroy()
+            window.deiconify() # Show main window
+        else:
+            mess._show(title='Login Failed', message='Incorrect Username or Password!')
+            
+    btn_login = tk.Button(login_win, text="Login", command=validate_login, fg=TEXT_COLOR, bg=ACCENT_BLUE, width=15, font=('times', 12, 'bold'), relief='flat')
+    btn_login.pack(pady=15)
+
+show_login_window()
 
 window.configure(menu=menubar)
 window.mainloop()
