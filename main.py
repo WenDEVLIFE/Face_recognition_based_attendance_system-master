@@ -326,15 +326,12 @@ def TrackImages():
                 ts = time.time()
                 date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
                 timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-                aa = df.loc[df['SERIAL NO.'] == serial]['NAME'].values
-                ID = df.loc[df['SERIAL NO.'] == serial]['ID'].values
+                aa = df.loc[df['SERIAL NO.'] == serial, 'NAME'].values[0]
+                ID = df.loc[df['SERIAL NO.'] == serial, 'ID'].values[0]
                 ID = str(ID)
-                ID = ID[1:-1]
                 bb = str(aa)
-                bb = bb[2:-2]
-                sec = df.loc[df['SERIAL NO.'] == serial]['SECTION'].values
+                sec = df.loc[df['SERIAL NO.'] == serial, 'SECTION'].values[0]
                 sec = str(sec)
-                sec = sec[2:-2] if len(sec) > 4 else sec
                 attendance = [str(ID), '', bb, '', sec, '', str(date), '', str(timeStamp)]
 
             else:
@@ -375,6 +372,7 @@ def TrackImages():
     cam.release()
     if cam_win.winfo_exists():
         cam_win.destroy()
+    mess._show(title='Attendance Successful', message='Attendance has been recorded successfully!')
 
 ######################################## USED STUFFS ############################################
     
