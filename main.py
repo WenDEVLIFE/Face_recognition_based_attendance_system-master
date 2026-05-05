@@ -180,7 +180,15 @@ def TakeImages():
         harcascadePath = "haarcascade_frontalface_default.xml"
         detector = cv2.CascadeClassifier(harcascadePath)
         sampleNum = 0
+        from PIL import ImageTk
+        cam_win = tk.Toplevel(window)
+        cam_win.title("Taking Images")
+        cam_lbl = tk.Label(cam_win)
+        cam_lbl.pack()
+        
         while (True):
+            if not cam_win.winfo_exists():
+                break
             ret, img = cam.read()
             if not ret or img is None:
                 mess._show(title='Camera Error', message='Cannot access the camera! Please ensure a webcam is connected.')
@@ -194,16 +202,21 @@ def TakeImages():
                 # saving the captured face in the dataset folder TrainingImage
                 cv2.imwrite("TrainingImage/" + name + "." + str(serial) + "." + Id + '.' + str(sampleNum) + ".jpg",
                             gray[y:y + h, x:x + w])
-                # display the frame
-                cv2.imshow('Taking Images', img)
-            # wait for 100 miliseconds
-            if cv2.waitKey(100) & 0xFF == ord('q'):
-                break
+                            
+            # display the frame using Tkinter
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img_pil = Image.fromarray(img_rgb)
+            imgtk = ImageTk.PhotoImage(image=img_pil)
+            cam_lbl.imgtk = imgtk
+            cam_lbl.configure(image=imgtk)
+            cam_win.update()
+            
             # break if the sample number is morethan 100
-            elif sampleNum > 100:
+            if sampleNum > 100:
                 break
         cam.release()
-        cv2.destroyAllWindows()
+        if cam_win.winfo_exists():
+            cam_win.destroy()
         res = "Images Taken for ID : " + Id
         row = [serial, '', Id, '', name, '', section]
         with open('StudentDetails/StudentDetails.csv', 'a+') as csvFile:
@@ -289,7 +302,15 @@ def TrackImages():
         cam.release()
         cv2.destroyAllWindows()
         window.destroy()
+    from PIL import ImageTk
+    cam_win = tk.Toplevel(window)
+    cam_win.title("Taking Attendance (Close Window to Stop)")
+    cam_lbl = tk.Label(cam_win)
+    cam_lbl.pack()
+    
     while True:
+        if not cam_win.winfo_exists():
+            break
         ret, im = cam.read()
         if not ret or im is None:
             mess._show(title='Camera Error', message='Cannot access the camera! Please ensure a webcam is connected.')
@@ -318,9 +339,14 @@ def TrackImages():
                 Id = 'Unknown'
                 bb = str(Id)
             cv2.putText(im, str(bb), (x, y + h), font, 1, (255, 255, 255), 2)
-        cv2.imshow('Taking Attendance', im)
-        if (cv2.waitKey(1) == ord('q')):
-            break
+            
+        # display the frame using Tkinter
+        img_rgb = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+        img_pil = Image.fromarray(img_rgb)
+        imgtk = ImageTk.PhotoImage(image=img_pil)
+        cam_lbl.imgtk = imgtk
+        cam_lbl.configure(image=imgtk)
+        cam_win.update()
     ts = time.time()
     date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
     exists = os.path.isfile("Attendance/Attendance_" + date + ".csv")
@@ -345,7 +371,8 @@ def TrackImages():
                     tv.insert('', 0, text=iidd, values=(str(lines[2]), str(lines[4]), str(lines[6]), str(lines[8])))
     csvFile1.close()
     cam.release()
-    cv2.destroyAllWindows()
+    if cam_win.winfo_exists():
+        cam_win.destroy()
 
 ######################################## USED STUFFS ############################################
     
