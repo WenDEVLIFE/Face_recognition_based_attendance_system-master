@@ -311,6 +311,7 @@ def TrackImages():
     cam_lbl = tk.Label(cam_win)
     cam_lbl.pack()
     
+    attendance = None
     while True:
         if not cam_win.winfo_exists():
             break
@@ -350,25 +351,26 @@ def TrackImages():
     ts = time.time()
     date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
     exists = os.path.isfile("Attendance/Attendance_" + date + ".csv")
-    if exists:
-        with open("Attendance/Attendance_" + date + ".csv", 'a+') as csvFile1:
-            writer = csv.writer(csvFile1)
-            writer.writerow(attendance)
-        csvFile1.close()
-    else:
-        with open("Attendance/Attendance_" + date + ".csv", 'a+') as csvFile1:
-            writer = csv.writer(csvFile1)
-            writer.writerow(col_names)
-            writer.writerow(attendance)
-        csvFile1.close()
+    if attendance is not None:
+        if exists:
+            with open("Attendance/Attendance_" + date + ".csv", 'a+') as csvFile1:
+                writer = csv.writer(csvFile1)
+                writer.writerow(attendance)
+            csvFile1.close()
+        else:
+            with open("Attendance/Attendance_" + date + ".csv", 'a+') as csvFile1:
+                writer = csv.writer(csvFile1)
+                writer.writerow(col_names)
+                writer.writerow(attendance)
+            csvFile1.close()
     with open("Attendance/Attendance_" + date + ".csv", 'r') as csvFile1:
         reader1 = csv.reader(csvFile1)
+        next(reader1, None) # Skip header row
         for lines in reader1:
-            i = i + 1
-            if (i > 1):
-                if (i % 2 != 0):
-                    iidd = str(lines[0]) + '   '
-                    tv.insert('', 0, text=iidd, values=(str(lines[2]), str(lines[4]), str(lines[6]), str(lines[8])))
+            if not lines:
+                continue
+            iidd = str(lines[0]) + '   '
+            tv.insert('', 0, text=iidd, values=(str(lines[2]), str(lines[4]), str(lines[6]), str(lines[8])))
     csvFile1.close()
     cam.release()
     if cam_win.winfo_exists():
