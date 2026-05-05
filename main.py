@@ -142,11 +142,16 @@ def clear2():
     res = "1)Take Images  >>>  2)Save Profile"
     message1.configure(text=res)
 
+def clear3():
+    txt3.delete(0, 'end')
+    res = "1)Take Images  >>>  2)Save Profile"
+    message1.configure(text=res)
+
 #######################################################################################
 
 def TakeImages():
     check_haarcascadefile()
-    columns = ['SERIAL NO.', '', 'ID', '', 'NAME']
+    columns = ['SERIAL NO.', '', 'ID', '', 'NAME', '', 'SECTION']
     assure_path_exists("StudentDetails/")
     assure_path_exists("TrainingImage/")
     serial = 0
@@ -166,6 +171,7 @@ def TakeImages():
         csvFile1.close()
     Id = (txt.get())
     name = (txt2.get())
+    section = (txt3.get())
     if ((name.isalpha()) or (' ' in name)):
         cam = cv2.VideoCapture(0)
         harcascadePath = "haarcascade_frontalface_default.xml"
@@ -196,7 +202,7 @@ def TakeImages():
         cam.release()
         cv2.destroyAllWindows()
         res = "Images Taken for ID : " + Id
-        row = [serial, '', Id, '', name]
+        row = [serial, '', Id, '', name, '', section]
         with open('StudentDetails/StudentDetails.csv', 'a+') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerow(row)
@@ -271,7 +277,7 @@ def TrackImages():
 
     cam = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
-    col_names = ['Id', '', 'Name', '', 'Date', '', 'Time']
+    col_names = ['Id', '', 'Name', '', 'Section', '', 'Date', '', 'Time']
     exists1 = os.path.isfile("StudentDetails/StudentDetails.csv")
     if exists1:
         df = pd.read_csv("StudentDetails/StudentDetails.csv")
@@ -300,7 +306,10 @@ def TrackImages():
                 ID = ID[1:-1]
                 bb = str(aa)
                 bb = bb[2:-2]
-                attendance = [str(ID), '', bb, '', str(date), '', str(timeStamp)]
+                sec = df.loc[df['SERIAL NO.'] == serial]['SECTION'].values
+                sec = str(sec)
+                sec = sec[2:-2] if len(sec) > 4 else sec
+                attendance = [str(ID), '', bb, '', sec, '', str(date), '', str(timeStamp)]
 
             else:
                 Id = 'Unknown'
@@ -330,7 +339,7 @@ def TrackImages():
             if (i > 1):
                 if (i % 2 != 0):
                     iidd = str(lines[0]) + '   '
-                    tv.insert('', 0, text=iidd, values=(str(lines[2]), str(lines[4]), str(lines[6])))
+                    tv.insert('', 0, text=iidd, values=(str(lines[2]), str(lines[4]), str(lines[6]), str(lines[8])))
     csvFile1.close()
     cam.release()
     cv2.destroyAllWindows()
@@ -405,19 +414,25 @@ head1 = tk.Label(frame1, text="                       For Already Registered    
 head1.place(x=0,y=0)
 
 lbl = tk.Label(frame2, text="Enter ID",width=20  ,height=1  ,fg=TEXT_COLOR  ,bg=FRAME_COLOR ,font=('times', 17, ' bold ') )
-lbl.place(x=80, y=55)
+lbl.place(x=80, y=30)
 
 txt = tk.Entry(frame2,width=32 ,fg=TEXT_COLOR,bg=INPUT_BG,font=('times', 15, ' bold '), insertbackground=TEXT_COLOR)
-txt.place(x=30, y=88)
+txt.place(x=30, y=60)
 
 lbl2 = tk.Label(frame2, text="Enter Name",width=20  ,fg=TEXT_COLOR  ,bg=FRAME_COLOR ,font=('times', 17, ' bold '))
-lbl2.place(x=80, y=140)
+lbl2.place(x=80, y=100)
 
 txt2 = tk.Entry(frame2,width=32 ,fg=TEXT_COLOR,bg=INPUT_BG,font=('times', 15, ' bold ') , insertbackground=TEXT_COLOR )
-txt2.place(x=30, y=173)
+txt2.place(x=30, y=130)
+
+lbl3_sec = tk.Label(frame2, text="Enter Section",width=20  ,fg=TEXT_COLOR  ,bg=FRAME_COLOR ,font=('times', 17, ' bold '))
+lbl3_sec.place(x=80, y=170)
+
+txt3 = tk.Entry(frame2,width=32 ,fg=TEXT_COLOR,bg=INPUT_BG,font=('times', 15, ' bold ') , insertbackground=TEXT_COLOR )
+txt3.place(x=30, y=200)
 
 message1 = tk.Label(frame2, text="1)Take Images  >>>  2)Save Profile" ,bg=FRAME_COLOR ,fg=TEXT_COLOR  ,width=39 ,height=1, activebackground = FRAME_COLOR ,font=('times', 15, ' bold '))
-message1.place(x=7, y=230)
+message1.place(x=7, y=250)
 
 message = tk.Label(frame2, text="" ,bg=FRAME_COLOR ,fg=TEXT_COLOR  ,width=39,height=1, activebackground = FRAME_COLOR ,font=('times', 16, ' bold '))
 message.place(x=7, y=450)
@@ -467,14 +482,16 @@ style.configure("Treeview.Heading",
 style.map("Treeview.Heading",
           background=[('active', FRAME_COLOR)])
 
-tv= ttk.Treeview(frame1,height =13,columns = ('name','date','time'))
-tv.column('#0',width=82)
-tv.column('name',width=130)
-tv.column('date',width=133)
-tv.column('time',width=133)
+tv= ttk.Treeview(frame1,height =13,columns = ('name','section','date','time'))
+tv.column('#0',width=60)
+tv.column('name',width=110)
+tv.column('section',width=90)
+tv.column('date',width=110)
+tv.column('time',width=110)
 tv.grid(row=2,column=0,padx=(0,0),pady=(150,0),columnspan=4)
 tv.heading('#0',text ='ID')
 tv.heading('name',text ='NAME')
+tv.heading('section',text ='SECTION')
 tv.heading('date',text ='DATE')
 tv.heading('time',text ='TIME')
 
@@ -487,9 +504,11 @@ tv.configure(yscrollcommand=scroll.set)
 ###################### BUTTONS ##################################
 
 clearButton = tk.Button(frame2, text="Clear", command=clear  ,fg=TEXT_COLOR  ,bg=ACCENT_RED  ,width=11 ,activebackground = "white" ,font=('times', 11, ' bold '), relief="flat")
-clearButton.place(x=335, y=86)
+clearButton.place(x=335, y=58)
 clearButton2 = tk.Button(frame2, text="Clear", command=clear2  ,fg=TEXT_COLOR  ,bg=ACCENT_RED  ,width=11 , activebackground = "white" ,font=('times', 11, ' bold '), relief="flat")
-clearButton2.place(x=335, y=172)    
+clearButton2.place(x=335, y=128)
+clearButton3 = tk.Button(frame2, text="Clear", command=clear3  ,fg=TEXT_COLOR  ,bg=ACCENT_RED  ,width=11 , activebackground = "white" ,font=('times', 11, ' bold '), relief="flat")
+clearButton3.place(x=335, y=198)    
 takeImg = tk.Button(frame2, text="Take Images", command=TakeImages  ,fg=TEXT_COLOR  ,bg=ACCENT_BLUE  ,width=34  ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
 takeImg.place(x=30, y=300)
 trainImg = tk.Button(frame2, text="Save Profile", command=psw ,fg=TEXT_COLOR  ,bg=ACCENT_GREEN  ,width=34  ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
