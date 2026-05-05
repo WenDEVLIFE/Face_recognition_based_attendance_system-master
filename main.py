@@ -234,7 +234,7 @@ def TakeImages():
 def TrainImages():
     check_haarcascadefile()
     assure_path_exists("TrainingImageLabel/")
-    recognizer = cv2.face_LBPHFaceRecognizer.create()
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
     harcascadePath = "haarcascade_frontalface_default.xml"
     detector = cv2.CascadeClassifier(harcascadePath)
     faces, ID = getImagesAndLabels("TrainingImage")
