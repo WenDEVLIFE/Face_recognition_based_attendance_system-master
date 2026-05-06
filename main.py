@@ -6,10 +6,9 @@ import tkinter.simpledialog as tsd
 import cv2,os
 import csv
 import numpy as np
-from PIL import Image
-import pandas as pd
 import datetime
 import time
+from PIL import Image, ImageTk
 
 # Ensure working directory is the script's directory
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -177,10 +176,6 @@ def TakeImages():
     section = (txt3.get())
     if ((name.isalpha()) or (' ' in name)):
         cam = cv2.VideoCapture(0)
-        harcascadePath = "haarcascade_frontalface_default.xml"
-        detector = cv2.CascadeClassifier(harcascadePath)
-        sampleNum = 0
-        from PIL import ImageTk
         cam_win = tk.Toplevel(window)
         cam_win.title("Taking Images")
         cam_lbl = tk.Label(cam_win)
@@ -305,7 +300,6 @@ def TrackImages():
         cam.release()
         cv2.destroyAllWindows()
         window.destroy()
-    from PIL import ImageTk
     cam_win = tk.Toplevel(window)
     cam_win.title("Taking Attendance (Close Window to Stop)")
     cam_lbl = tk.Label(cam_win)
@@ -403,48 +397,66 @@ mont={'01':'January',
 ######################################## GUI FRONT-END ###########################################
 
 # --- Theme Colors ---
-BG_COLOR = "#121212"
-FRAME_COLOR = "#1E1E1E"
+BG_COLOR = "#0b0f14"  # Darker background
+FRAME_COLOR = "#111827" # Dark blue-gray for frames
 TEXT_COLOR = "#FFFFFF"
 ACCENT_BLUE = "#3B82F6"
 ACCENT_GREEN = "#10B981"
 ACCENT_RED = "#EF4444"
-INPUT_BG = "#2D2D2D"
+INPUT_BG = "#1f2937"
 # --------------------
 
 window = tk.Tk()
 window.geometry("1280x720")
 window.resizable(True,False)
-window.title("Attendance System")
+window.title("Face Recognition Attendance System")
 window.configure(background=BG_COLOR)
 
-frame1 = tk.Frame(window, bg=FRAME_COLOR, bd=0, highlightthickness=0)
-frame1.place(relx=0.11, rely=0.17, relwidth=0.39, relheight=0.80)
+# Load logos
+logo1 = Image.open("logo/logo1.png")
+logo1 = logo1.resize((80, 80), Image.Resampling.LANCZOS)
+logo1_img = ImageTk.PhotoImage(logo1)
 
-frame2 = tk.Frame(window, bg=FRAME_COLOR, bd=0, highlightthickness=0)
-frame2.place(relx=0.51, rely=0.17, relwidth=0.38, relheight=0.80)
+logo2 = Image.open("logo/logo2.png")
+logo2 = logo2.resize((80, 80), Image.Resampling.LANCZOS)
+logo2_img = ImageTk.PhotoImage(logo2)
 
-message3 = tk.Label(window, text="Face Recognition Based Attendance System" ,fg=TEXT_COLOR,bg=BG_COLOR ,width=55 ,height=1,font=('times', 29, ' bold '))
-message3.place(x=10, y=10)
+# Header Section
+header_frame = tk.Frame(window, bg=BG_COLOR)
+header_frame.place(relx=0, rely=0, relwidth=1, relheight=0.12)
 
-frame3 = tk.Frame(window, bg=BG_COLOR)
-frame3.place(relx=0.52, rely=0.09, relwidth=0.09, relheight=0.07)
+logo1_lbl = tk.Label(header_frame, image=logo1_img, bg=BG_COLOR)
+logo1_lbl.place(x=50, y=5)
 
-frame4 = tk.Frame(window, bg=BG_COLOR)
-frame4.place(relx=0.36, rely=0.09, relwidth=0.16, relheight=0.07)
+title_lbl = tk.Label(header_frame, text="Pamantasan ng Lungsod ng Muntinlupa", fg=TEXT_COLOR, bg=BG_COLOR, font=('times', 32, 'bold'))
+title_lbl.place(relx=0.5, rely=0.5, anchor='center')
 
-datef = tk.Label(frame4, text = day+"-"+mont[month]+"-"+year+"  |  ", fg=ACCENT_BLUE,bg=BG_COLOR ,width=55 ,height=1,font=('times', 22, ' bold '))
-datef.pack(fill='both',expand=1)
+logo2_lbl = tk.Label(header_frame, image=logo2_img, bg=BG_COLOR)
+logo2_lbl.place(relx=1.0, x=-130, y=5)
 
-clock = tk.Label(frame3,fg=ACCENT_BLUE,bg=BG_COLOR ,width=55 ,height=1,font=('times', 22, ' bold '))
-clock.pack(fill='both',expand=1)
+# Date and Time Display
+date_time_frame = tk.Frame(window, bg=BG_COLOR)
+date_time_frame.place(relx=0, rely=0.12, relwidth=1, relheight=0.05)
+
+date_time_str = day + "-" + mont[month] + "-" + year + "  |  "
+date_lbl = tk.Label(date_time_frame, text=date_time_str, fg=ACCENT_BLUE, bg=BG_COLOR, font=('times', 22, 'bold'))
+date_lbl.pack(side='left', expand=True, padx=(200, 0))
+
+clock = tk.Label(date_time_frame, fg=ACCENT_BLUE, bg=BG_COLOR, font=('times', 22, 'bold'))
+clock.pack(side='left')
 tick()
 
-head2 = tk.Label(frame2, text="                       For New Registrations                       ", fg=TEXT_COLOR,bg=ACCENT_BLUE ,font=('times', 17, ' bold ') )
-head2.grid(row=0,column=0)
+frame1 = tk.Frame(window, bg=FRAME_COLOR, bd=2, relief='ridge')
+frame1.place(relx=0.02, rely=0.20, relwidth=0.47, relheight=0.78)
 
-head1 = tk.Label(frame1, text="                       For Already Registered                       ", fg=TEXT_COLOR,bg=ACCENT_BLUE ,font=('times', 17, ' bold ') )
-head1.place(x=0,y=0)
+frame2 = tk.Frame(window, bg=FRAME_COLOR, bd=2, relief='ridge')
+frame2.place(relx=0.51, rely=0.20, relwidth=0.47, relheight=0.78)
+
+head2 = tk.Label(frame2, text="For New Registrations", fg=TEXT_COLOR, bg=ACCENT_BLUE, font=('times', 17, 'bold'))
+head2.place(relx=0, rely=0, relwidth=1)
+
+head1 = tk.Label(frame1, text="For Already Registered", fg=TEXT_COLOR, bg=ACCENT_BLUE, font=('times', 17, 'bold'))
+head1.place(relx=0, rely=0, relwidth=1)
 
 lbl = tk.Label(frame2, text="Enter ID",width=20  ,height=1  ,fg=TEXT_COLOR  ,bg=FRAME_COLOR ,font=('times', 17, ' bold ') )
 lbl.place(x=80, y=30)
@@ -468,10 +480,10 @@ message1 = tk.Label(frame2, text="1)Take Images  >>>  2)Save Profile" ,bg=FRAME_
 message1.place(x=7, y=250)
 
 message = tk.Label(frame2, text="" ,bg=FRAME_COLOR ,fg=TEXT_COLOR  ,width=39,height=1, activebackground = FRAME_COLOR ,font=('times', 16, ' bold '))
-message.place(x=7, y=450)
+message.place(relx=0.5, y=530, anchor='center')
 
 lbl3 = tk.Label(frame1, text="Attendance",width=20  ,fg=TEXT_COLOR  ,bg=FRAME_COLOR  ,height=1 ,font=('times', 17, ' bold '))
-lbl3.place(x=100, y=115)
+lbl3.place(relx=0.5, y=115, anchor='center')
 
 res=0
 exists = os.path.isfile("StudentDetails/StudentDetails.csv")
@@ -521,7 +533,7 @@ tv.column('name',width=110)
 tv.column('section',width=90)
 tv.column('date',width=110)
 tv.column('time',width=110)
-tv.grid(row=2,column=0,padx=(0,0),pady=(150,0),columnspan=4)
+tv.grid(row=2,column=0,padx=(20,0),pady=(150,0),columnspan=4)
 tv.heading('#0',text ='ID')
 tv.heading('name',text ='NAME')
 tv.heading('section',text ='SECTION')
@@ -543,13 +555,13 @@ clearButton2.place(x=335, y=128)
 clearButton3 = tk.Button(frame2, text="Clear", command=clear3  ,fg=TEXT_COLOR  ,bg=ACCENT_RED  ,width=11 , activebackground = "white" ,font=('times', 11, ' bold '), relief="flat")
 clearButton3.place(x=335, y=198)    
 takeImg = tk.Button(frame2, text="Take Images", command=TakeImages  ,fg=TEXT_COLOR  ,bg=ACCENT_BLUE  ,width=34  ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
-takeImg.place(x=30, y=300)
+takeImg.place(relx=0.5, y=300, anchor='center')
 trainImg = tk.Button(frame2, text="Save Profile", command=psw ,fg=TEXT_COLOR  ,bg=ACCENT_GREEN  ,width=34  ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
-trainImg.place(x=30, y=380)
+trainImg.place(relx=0.5, y=380, anchor='center')
 trackImg = tk.Button(frame1, text="Take Attendance", command=TrackImages  ,fg=TEXT_COLOR  ,bg=ACCENT_BLUE  ,width=35  ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
-trackImg.place(x=30,y=50)
+trackImg.place(relx=0.5, y=50, anchor='center')
 quitWindow = tk.Button(frame1, text="Quit", command=window.destroy  ,fg=TEXT_COLOR  ,bg=ACCENT_RED  ,width=35 ,height=1, activebackground = "white" ,font=('times', 15, ' bold '), relief="flat")
-quitWindow.place(x=30, y=450)
+quitWindow.place(relx=0.5, y=530, anchor='center')
 
 ##################### END ######################################
 
