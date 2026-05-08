@@ -6,6 +6,7 @@ import tkinter.simpledialog as tsd
 import cv2,os
 import csv
 import numpy as np
+import pandas as pd
 import datetime
 import time
 from PIL import Image, ImageTk
@@ -175,6 +176,9 @@ def TakeImages():
     name = (txt2.get())
     section = (txt3.get())
     if ((name.isalpha()) or (' ' in name)):
+        # Initialize the face detector and sample counter here
+        detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        sampleNum = 0
         cam = cv2.VideoCapture(0)
         cam_win = tk.Toplevel(window)
         cam_win.title("Taking Images")
